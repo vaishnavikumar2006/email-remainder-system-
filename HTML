@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Email Reminder System</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #eef;
+      text-align: center;
+      margin-top: 100px;
+    }
+    form {
+      background: white;
+      display: inline-block;
+      padding: 20px;
+      border-radius: 8px;
+      box-shadow: 0 0 10px gray;
+    }
+    input, textarea {
+      display: block;
+      margin: 10px auto;
+      padding: 8px;
+      width: 250px;
+    }
+    button {
+      padding: 10px 20px;
+      background: blue;
+      color: white;
+      border: none;
+      border-radius: 5px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+  <h1>📧 Email Reminder System</h1>
+  <form action="/set-reminder" method="POST">
+    <input type="email" name="email" placeholder="Enter your email" required />
+    <textarea name="message" placeholder="Reminder message" required></textarea>
+    <input type="datetime-local" name="time" required />
+    <button type="submit">Set Reminder</button>
+  </form>
+</body>
+</html>
