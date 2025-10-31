@@ -1,0 +1,81 @@
+// ✅ Email Reminder System - server.js
+const express = require('express');
+const bodyParser = require('body-parser');
+const nodemailer = require('nodemailer');
+const cron = require('node-cron');
+const path = require('path');
+
+const app = express();
+const PORT = 3000;
+
+// Middleware
+app.use(bodyParser.urlencoded({ extended: true }));
+app.use(express.static(path.join(__dirname, 'public')));
+
+// ✅ Test route
+app.get('/test', (req, res) => {
+  res.send('Server is working ✅');
+});
+
+// ✅ Email configuration — replace with your own details
+const transporter = nodemailer.createTransport({
+  service: 'gmail',
+  auth: {
+    user: 'your_email@gmail.com',       // 🔹 Replace with your Gmail
+    pass: 'your_app_password'           // 🔹 Use Gmail "App password"
+  }
+});
+
+// ✅ Store reminders in memory
+let reminders = [];
+
+// ✅ Handle form submissions from index.html
+app.post('/set-reminder', (req, res) => {
+  const { email, message, time } = req.body;
+  const reminderTime = new Date(time);
+
+  // Validation
+  if (reminderTime < new Date()) {
+    return res.send('⏰ Reminder time must be in the future!');
+  }
+
+  // Save reminder
+  reminders.push({ email, message, time: reminderTime });
+  console.log('📝 New reminder added:', { email, message, time });
+
+  // Show a confirmation page
+  res.sendFile(path.join(__dirname, 'public', 'success.html'));
+});
+
+// ✅ Check every minute for reminders
+cron.schedule('* * * * *', () => {
+  const now = new Date();
+
+  reminders = reminders.filter(reminder => {
+    if (now >= reminder.time) {
+      // Send email
+      const mailOptions = {
+        from: 'your_email@gmail.com',
+        to: reminder.email,
+        subject: '⏰ Reminder Notification',
+        text: reminder.message
+      };
+
+      transporter.sendMail(mailOptions, (error, info) => {
+        if (error) {
+          console.log('❌ Email error:', error);
+        } else {
+          console.log('📧 Email sent to', reminder.email);
+        }
+      });
+
+      return false; // Remove after sending
+    }
+    return true;
+  });
+});
+
+// ✅ Start the server
+app.listen(PORT, () => {
+  console.log(🚀 Server running at http://localhost:${PORT});
+});
